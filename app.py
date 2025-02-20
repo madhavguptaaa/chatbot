@@ -109,35 +109,47 @@ def main():
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
 
-    # Display chat history
-    for message in st.session_state.chat_history:
-        with st.chat_message(message["role"]):
-            st.write(message["content"])
-
     # Chat input
     user_input = st.chat_input("Type your question here...")
     
     if user_input:
-        # Add user message to chat history
-        st.session_state.chat_history.append({"role": "user", "content": user_input})
+        # Display user message
+        with st.chat_message("user"):
+            st.write(user_input)
         
-        # Get chatbot response
+        # Get and display chatbot response
         response = st.session_state.chatbot.get_response(user_input)
+        with st.chat_message("assistant"):
+            st.write(response["text"])
         
-        # Add bot response to chat history
-        st.session_state.chat_history.append({"role": "assistant", "content": response["text"]})
+        # Save to chat history
+        st.session_state.chat_history.extend([
+            {"role": "user", "content": user_input},
+            {"role": "assistant", "content": response["text"]}
+        ])
         
-        # Show suggestions
+        # Show suggestions in a container below the chat
         if response["suggestions"]:
-            with st.expander("Suggested questions"):
-                for suggestion in response["suggestions"]:
-                    st.button(suggestion, key=suggestion, on_click=lambda s=suggestion: ask_suggestion(s))
-
-def ask_suggestion(suggestion):
-    # Add suggested question to chat history and get response
-    st.session_state.chat_history.append({"role": "user", "content": suggestion})
-    response = st.session_state.chatbot.get_response(suggestion)
-    st.session_state.chat_history.append({"role": "assistant", "content": response["text"]})
+            with st.container():
+                st.write("Suggested questions:")
+                cols = st.columns(len(response["suggestions"]))
+                for idx, suggestion in enumerate(response["suggestions"]):
+                    if cols[idx].button(suggestion, key=f"suggest_{idx}"):
+                        # Immediately show response for suggestion
+                        with st.chat_message("user"):
+                            st.write(suggestion)
+                        suggest_response = st.session_state.chatbot.get_response(suggestion)
+                        with st.chat_message("assistant"):
+                            st.write(suggest_response["text"])
+                        st.session_state.chat_history.extend([
+                            {"role": "user", "content": suggestion},
+                            {"role": "assistant", "content": suggest_response["text"]}
+                        ])
+    
+    # Display chat history
+    for message in st.session_state.chat_history:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
 
 if __name__ == "__main__":
     main()
