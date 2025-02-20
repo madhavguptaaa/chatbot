@@ -1,52 +1,56 @@
+
+from flask import Flask, render_template, request, jsonify
+
+app = Flask(__name__)
+
 class FinTechChatbot:
-    def __init__(self, llm_model):
-        self.llm_model = llm_model
-        self.greetings = "Hello! You can ask me about your balance, transferring money, investments, loans, credit scores, interest rates, and financial services."
+    def __init__(self):
+        self.knowledge_base = {
+            'loan': 'A loan is a sum of money that is borrowed and expected to be paid back with interest.',
+            'interest rate': 'An interest rate is the percentage of a loan that is charged as interest to the borrower.',
+            'credit report': 'A credit report is a detailed summary of an individual\'s credit history, used by lenders to assess creditworthiness.',
+            'credit bureau': 'A credit bureau is an agency that collects and maintains individual credit information and provides it to lenders, creditors, and consumers.',
+            'cibil': 'CIBIL (Credit Information Bureau India Limited) is India\'s first credit information company. It maintains credit records of individuals and companies.',
+            'credit score': 'A credit score is a numerical expression based on a statistical analysis of a person\'s credit files, representing the creditworthiness of an individual.',
+            'mortgage': 'A mortgage is a loan used to purchase real estate, where the property serves as collateral.',
+            'emi': 'EMI (Equated Monthly Installment) is a fixed payment amount made by a borrower to a lender at a specified date each month.',
+            'collateral': 'Collateral is an asset that a lender accepts as security for a loan. If the borrower defaults, the lender can seize the collateral.',
+            'debt': 'Debt is money borrowed by one party from another, often with interest charges.',
+            'credit limit': 'Credit limit is the maximum amount of credit that a financial institution extends to a client.',
+            'kyc': 'KYC (Know Your Customer) is a standard due diligence process used by financial institutions to verify customer identity and assess risks.',
+            'net banking': 'Net banking allows customers to conduct financial transactions through their bank\'s website.',
+            'upi': 'UPI (Unified Payments Interface) is an instant real-time payment system that enables inter-bank transactions.'
+        }
 
-    def respond(self, user_input):
-        # Use the LLM to generate a response based on user input
+    def get_response(self, user_input):
         user_input = user_input.lower()
-        if 'bye' in user_input or 'thanks' in user_input:
-            return "Goodbye!"
-        # Use the LLM to generate a response based on user input
-        response = self.llm_model.generate_response(user_input)
-        return response
+        
+        # Check for direct matches in knowledge base
+        for key in self.knowledge_base:
+            if key in user_input:
+                return self.knowledge_base[key]
+        
+        # Handle common greetings
+        greetings = ['hi', 'hello', 'hey']
+        if any(greeting in user_input for greeting in greetings):
+            return "Hello! I'm your FinTech assistant. How can I help you today?"
+        
+        # Handle general help request
+        if 'help' in user_input:
+            return "I can help you with information about loans, interest rates, credit scores, CIBIL, mortgages, EMI, and other financial topics. What would you like to know?"
+        
+        return "I'm sorry, I don't have information about that topic. You can ask me about loans, interest rates, credit reports, CIBIL, mortgages, EMI, or other banking services."
 
-# Mock LLM model for demonstration purposes
-class MockLLM:
-    def generate_response(self, user_input):
-        # Simulated response generation logic
-        user_input = user_input.lower()
-        if 'balance' in user_input:
-            return "Your current balance is $1,234.56."
-        elif 'transfer' in user_input:
-            return "Please provide the amount and recipient for the transfer."
-        elif 'invest' in user_input:
-            return "What type of investment are you interested in?"
-        elif 'loan' in user_input:
-            return "What is the current interest rate for personal loans?"
-        elif 'credit' in user_input:
-            return "How can I improve my credit score?"
-        elif 'interest' in user_input:
-            return "What factors affect interest rates on loans?"
-        elif 'financial services' in user_input:
-            return "What financial services do you offer?"
-        else:
-            return "I'm sorry, I didn't understand that. Can you please rephrase?"
+chatbot = FinTechChatbot()
 
-# Create an instance of the mock LLM
-mock_llm = MockLLM()
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-# Create an instance of the chatbot with the LLM
-chatbot = FinTechChatbot(mock_llm)
+@app.route('/get_response', methods=['POST'])
+def get_bot_response():
+    user_message = request.form['msg']
+    return jsonify({'response': chatbot.get_response(user_message)})
 
-# Simulate a conversation
-print(chatbot.greetings)
-print(chatbot.respond('What is my balance?'))
-print(chatbot.respond('I want to transfer money.'))
-print(chatbot.respond('Can you tell me about loans?'))
-print(chatbot.respond('How can I improve my credit score?'))
-print(chatbot.respond('What are the current interest rates?'))
-print(chatbot.respond('What financial services do you offer?'))
-print(chatbot.respond('bye'))
-print(chatbot.respond('thanks'))
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080)
