@@ -100,11 +100,10 @@ def main():
     st.title("FinTech Chatbot 💰")
     st.write("Ask me about loans, credit scores, and interest rates!")
 
-    # Initialize chatbot
     if 'chatbot' not in st.session_state:
         st.session_state.chatbot = FintechChatbot()
     
-    # Initialize chat history
+
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
 
