@@ -1,9 +1,9 @@
-# app.py
+
 import streamlit as st
 from typing import Dict, List, Optional
 
 class FintechChatbot:
-    # [Previous FintechChatbot class implementation remains the same]
+    
     def __init__(self):
         self.knowledge_base = {
             "loan": {
@@ -90,7 +90,6 @@ class FintechChatbot:
 
         return response
 
-# Streamlit web interface
 def main():
     st.set_page_config(
         page_title="FinTech Chatbot",
@@ -109,33 +108,30 @@ def main():
     if 'chat_history' not in st.session_state:
         st.session_state.chat_history = []
 
-    # Chat input
     user_input = st.chat_input("Type your question here...")
     
     if user_input:
-        # Display user message
+
         with st.chat_message("user"):
             st.write(user_input)
         
-        # Get and display chatbot response
+      
         response = st.session_state.chatbot.get_response(user_input)
         with st.chat_message("assistant"):
             st.write(response["text"])
-        
-        # Save to chat history
+
         st.session_state.chat_history.extend([
             {"role": "user", "content": user_input},
             {"role": "assistant", "content": response["text"]}
         ])
-        
-        # Show suggestions in a container below the chat
+
         if response["suggestions"]:
             with st.container():
                 st.write("Suggested questions:")
                 cols = st.columns(len(response["suggestions"]))
                 for idx, suggestion in enumerate(response["suggestions"]):
                     if cols[idx].button(suggestion, key=f"suggest_{idx}"):
-                        # Immediately show response for suggestion
+
                         with st.chat_message("user"):
                             st.write(suggestion)
                         suggest_response = st.session_state.chatbot.get_response(suggestion)
@@ -146,7 +142,6 @@ def main():
                             {"role": "assistant", "content": suggest_response["text"]}
                         ])
     
-    # Display chat history
     for message in st.session_state.chat_history:
         with st.chat_message(message["role"]):
             st.write(message["content"])
