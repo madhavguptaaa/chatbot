@@ -1,0 +1,52 @@
+class FinTechChatbot:
+    def __init__(self, llm_model):
+        self.llm_model = llm_model
+        self.greetings = "Hello! You can ask me about your balance, transferring money, investments, loans, credit scores, interest rates, and financial services."
+
+    def respond(self, user_input):
+        # Use the LLM to generate a response based on user input
+        user_input = user_input.lower()
+        if 'bye' in user_input or 'thanks' in user_input:
+            return "Goodbye!"
+        # Use the LLM to generate a response based on user input
+        response = self.llm_model.generate_response(user_input)
+        return response
+
+# Mock LLM model for demonstration purposes
+class MockLLM:
+    def generate_response(self, user_input):
+        # Simulated response generation logic
+        user_input = user_input.lower()
+        if 'balance' in user_input:
+            return "Your current balance is $1,234.56."
+        elif 'transfer' in user_input:
+            return "Please provide the amount and recipient for the transfer."
+        elif 'invest' in user_input:
+            return "What type of investment are you interested in?"
+        elif 'loan' in user_input:
+            return "What is the current interest rate for personal loans?"
+        elif 'credit' in user_input:
+            return "How can I improve my credit score?"
+        elif 'interest' in user_input:
+            return "What factors affect interest rates on loans?"
+        elif 'financial services' in user_input:
+            return "What financial services do you offer?"
+        else:
+            return "I'm sorry, I didn't understand that. Can you please rephrase?"
+
+# Create an instance of the mock LLM
+mock_llm = MockLLM()
+
+# Create an instance of the chatbot with the LLM
+chatbot = FinTechChatbot(mock_llm)
+
+# Simulate a conversation
+print(chatbot.greetings)
+print(chatbot.respond('What is my balance?'))
+print(chatbot.respond('I want to transfer money.'))
+print(chatbot.respond('Can you tell me about loans?'))
+print(chatbot.respond('How can I improve my credit score?'))
+print(chatbot.respond('What are the current interest rates?'))
+print(chatbot.respond('What financial services do you offer?'))
+print(chatbot.respond('bye'))
+print(chatbot.respond('thanks'))
